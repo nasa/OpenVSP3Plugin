@@ -70,5 +70,5 @@ and check the `Show Java Console` checkbox.
 == Documentation
 
 A presentation on how to use the OpenVSP3Plugin is located here:
-presentations/welstead-openvsp3plugin.ppt[OpenVSP Workshop 2017 OpenVSP3Plugin]
+link:presentations/welstead-openvsp3plugin.ppt[OpenVSP Workshop 2017 OpenVSP3Plugin]
 
