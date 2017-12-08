@@ -1,0 +1,73 @@
+= OpenVSP3Plugin
+A plugin to run OpenVSP in a MDAO frameworks.
+
+== What is OpenVSP?
+
+Open Vehicle Sketch Pad (OpenVSP) is a parametric aircraft geometry tool.
+OpenVSP allows the user to create a 3D model of an aircraft defined by common engineering parameters.
+This model can be processed into formats suitable for engineering analysis.footnoteref:[openvsporg, from www.openvsp.org/learn.shtml]
+
+The predecessors to OpenVSP have been developed by J.R. Gloudemans and others for NASA since the early 1990's.
+On January 10 2012, OpenVSP was released as an open source project under the NASA Open Source Agreement (NOSA) version 1.3.footnoteref:[openvsporg]
+
+== What is the OpenVPS3Plugin?
+
+The OpenVSP3Plugin is a JAVA software tool that allows for the interface between OpenVSP and an analysis framework such as *Phoenix Integration's ModelCenter* or the NASA developed *OpenMDAO* software.
+The OpenVSP3Plugin is designed to work on any computer desktop platform (Mac, Linux, and Windows) that has a local installation of JAVA.
+
+.[big]#The OpenVSP3Plugin performs three main functions:#
+1. Parse an OpenVSP v. 3 file
+2. Auto-generate an OpenVSP script and a design (.des) file
+3. Execute OpenVSP with the auto-generated script and apply user selected design variables in the design file. (ModelCenter only)
+
+The user selects the design variables written in the design file through the interactive graphical user interface.
+
+== Build
+
+To build the OpenVSP3Plugin, edit the build.bat file and run it.
+Edit the build.bat file and set *JDK_HOME* to the path of your JAVA installation.
+If you have *ModelCenter* installed set *MC_INSTALL* to the path of your *ModelCenter* installation.
+
+
+[source,options-"nowrap"]
+----
+:: JDK_HOME is required and must point to an installed JDK 
+set "JDK_HOME=C:/Program Files/Java/jdk1.8.0_151"
+
+:: MC_INSTALL is optional but required to use the plugin with ModelCenter
+:: Comment this line if you don't have ModelCenter
+::set "MC_INSTALL=C:/Program Files/Phoenix Integration/ModelCenter 12.0"
+----
+
+== Prebuilt releases (OpenVSP3Plugin.jar)
+
+Prebuilt releases will be built using the latest source code and JAVA 8 JDK and ModelCenter 12 interfaces
+
+== Installation
+
+There is no custom installer for the OpenVSP3Plugin, it must be done by hand. +
+The OpenVSP3Plugin uses 2 environment variables:
+
+`*OpenVSP_EXE* (__Required__)`:: This needs to be set to the path of the OpenVSP executable (vsp.exe) that the plugin will use.
+`*TMP* (__ModelCenter only__)`:: (probably already set on your machine) Is used to create temporary folders in which OpenVSP is executed, and the output files are parsed.
+
+== OpenMDAO
+
+To use the OpenVSP3Plugin in an OpenMDAO environment simply execute the OpenVSP3Plugin.jar file.
+This can be accomplished by running the following command: +
+`java -jar OpenVSP3Plugin.jar`
+
+In this mode all temporary files are written to the current working directory.
+
+== ModelCenter
+
+See ModelCenter help on installing plugins and "registrationless plugins".
+
+OpenVSP3Plugin logging can be viewed in the ModelCenter JAVA Console.
+Open the "Preferences" dialog, `Tools->Preferences...`, select the `Java Plug-Ins` tab,
+and check the `Show Java Console` checkbox.
+
+== Documentation
+
+A presentation on how to use the OpenVSP3Plugin is located here:
+http://github.com/nasa/openvsp3plugin/presentations/welstead-openvsp3plugin.ppt[OpenVSP Workshop 2017 OpenVSP3Plugin]

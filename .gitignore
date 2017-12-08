@@ -1,0 +1,23 @@
+# Gradle.
+.gradle/
+/build/
+
+# IntelliJ.
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Netbeans
+/nbproject/
+/build/
+/dist/
+
+# Eclipse
+.settings/
+.project
+.classpath
+
+# build.bat
+manifest2.mf
+
