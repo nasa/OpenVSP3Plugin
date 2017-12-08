@@ -576,7 +576,7 @@ class JavaFXUI {
 		tableViewData = designVariableList;
 		setChoiceBox.getItems().clear();
 		setChoiceBox.getItems().addAll(openVSP3File.getSetNames());
-		setChoiceBox.getSelectionModel().select(1);
+		setChoiceBox.getSelectionModel().select(0);
 		updateFilters();
 		loadTreeView();
 	}
@@ -655,7 +655,20 @@ class JavaFXUI {
 			String variableName = dv.getModelCenterName(false, true, false);
 			ObservableList<DesignVariable> existing = designVariableList.filtered(v -> (v.getModelCenterName(false, true, false).equals(variableName)));
 			if (existing.isEmpty()) {
-				if (!ignoreWarnings) {
+				String variableNameNoID = dv.getModelCenterName(false, false, false);
+				ObservableList<DesignVariable> existingNoID = designVariableList.filtered(v -> (v.getModelCenterName(false, false, false).equals(variableNameNoID)));
+				if (existingNoID.size() == 1) {
+					boolean useNew = dialog.showPopup(String.format("Could not find design variable\n%s\nbut found variable\n%s\n\nUse the new variable?", variableName, variableNameNoID));
+					if (useNew) {
+						DesignVariable dv2 = existingNoID.get(0);
+						// set openVSP3File design variable to match state
+						dv2.checkedProperty().set(true);
+						dv2.valueProperty().setValue(dv.getValue());
+						// set the vsp value on the state dv
+						dv.setVspValue(dv2.getVspValue());
+						dv.setXPath(dv2.getXPath());
+					}
+				} else if (!ignoreWarnings) {
 					String message = String.format("Could not find design variable %s in vsp3 file.", variableName);
 					ignoreWarnings = dialog.showPopup(message + question);
 				}
@@ -731,9 +744,6 @@ class JavaFXUI {
 		// PropertyValueFactory looks for checkedProperty() method but will use getChecked() but table won't update automatically
 		selectedCol.setCellValueFactory(new PropertyValueFactory<>("checked"));
 		selectedCol.setCellFactory(CheckBoxTableCell.forTableColumn(selectedCol));
-		TableColumn<DesignVariable, String> outputCol = new TableColumn<>("State");
-		outputCol.setCellValueFactory(new PropertyValueFactory<>("state"));
-		outputCol.setCellFactory(cellFactory);
 		TableColumn<DesignVariable, String> containerCol = new TableColumn<>("Container");
 		containerCol.setCellValueFactory(new PropertyValueFactory<>("container"));
 		containerCol.setCellFactory(cellFactory);
@@ -754,7 +764,14 @@ class JavaFXUI {
 		idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 		idCol.setCellFactory(cellFactory);
 		idCol.setPrefWidth(100);
-		tableView.getColumns().setAll(selectedCol, containerCol, groupCol, nameCol, valueCol, idCol, outputCol);
+		TableColumn<DesignVariable, String> stateCol = new TableColumn<>("State");
+		stateCol.setCellValueFactory(new PropertyValueFactory<>("state"));
+		stateCol.setCellFactory(cellFactory);
+		TableColumn<DesignVariable, String> vspValCol = new TableColumn<>("VSP Value");
+		vspValCol.setCellValueFactory(new PropertyValueFactory<>("vspValue"));
+		vspValCol.setCellFactory(cellFactory);
+		vspValCol.setPrefWidth(200);
+		tableView.getColumns().setAll(selectedCol, containerCol, groupCol, nameCol, valueCol, idCol, stateCol, vspValCol);
 		tableView.setEditable(true);
 		tableView.setOnKeyPressed(event -> {
 			DesignVariable dv = tableView.getSelectionModel().getSelectedItem();

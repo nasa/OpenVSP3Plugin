@@ -35,9 +35,9 @@ public class DesignVariable {
 	final private SimpleStringProperty value;
 	final private SimpleStringProperty xpath;
 	final private SimpleStringProperty state;
+	final private SimpleStringProperty vspValue;
 	final private SimpleBooleanProperty checked;
 	final private String fullName;
-	private String vspValue = null;
 	
 	public DesignVariable(DesignVariable dv) {
 		this.container = new SimpleStringProperty(dv.container.get());
@@ -47,9 +47,9 @@ public class DesignVariable {
 		this.value = new SimpleStringProperty(dv.value.get());
 		this.xpath = new SimpleStringProperty(dv.xpath.get());
 		this.state = new SimpleStringProperty(dv.state.get());
+		this.vspValue = new SimpleStringProperty(dv.vspValue.get());
 		this.checked = new SimpleBooleanProperty(dv.checked.get());
 		this.fullName = dv.fullName;
-		this.vspValue = dv.vspValue;
 	}
 	
 	public DesignVariable(String container, String group, String name, String id, String value) {
@@ -60,6 +60,7 @@ public class DesignVariable {
 		this.value = new SimpleStringProperty(value);
 		this.xpath = new SimpleStringProperty("");
 		this.state = new SimpleStringProperty("Input");
+		this.vspValue = new SimpleStringProperty();
 		this.checked = new SimpleBooleanProperty(false);
 		this.fullName = container + ":" + group + ":" + name;
 	}
@@ -93,6 +94,10 @@ public class DesignVariable {
 		return state;
 	}
 	
+	public SimpleStringProperty vspValueProperty() {
+		return vspValue;
+	}
+	
 	public SimpleBooleanProperty checkedProperty() {
 		return checked;
 	}
@@ -118,11 +123,11 @@ public class DesignVariable {
 	}
 	
 	public String getVspValue() {
-		return vspValue;
+		return vspValue.get();
 	}
 	
 	public void setVspValue(String value) {
-		vspValue = value;
+		vspValue.set(value);
 	}
 	
 	public String getXPath() {

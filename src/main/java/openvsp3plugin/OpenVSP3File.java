@@ -26,6 +26,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
+import static openvsp3plugin.OpenVSP3Plugin.CFDEXPORTS;
+import static openvsp3plugin.OpenVSP3Plugin.CFDFILE;
 import static openvsp3plugin.OpenVSP3Plugin.COMPGEOM;
 import static openvsp3plugin.OpenVSP3Plugin.COMPGEOM2;
 import static openvsp3plugin.OpenVSP3Plugin.EXPORTS;
@@ -197,6 +199,7 @@ public class OpenVSP3File {
 		String name = xpu.getElement(prefix + "/Name");
 		TreeItem<DesignVariableGroup> container = new TreeItem<>(new DesignVariableGroup(name));
 		addContainer(container, prefix);
+		if (name.equals("CFDMeshSettings")) addCFDFileContainer(container);
 		return container;
 	}
 	
@@ -204,6 +207,12 @@ public class OpenVSP3File {
 		// Exportable file types
 		TreeItem<DesignVariableGroup> container = new TreeItem<>(new DesignVariableGroup(FILE));
 		addOutputGroup(container, FILE, EXPORTS, FILE);
+		return container;
+	}
+	
+	private TreeItem<DesignVariableGroup> addCFDFileContainer(TreeItem<DesignVariableGroup> container) throws Exception {
+		// CFD file types
+		addOutputGroup(container, CFDFILE, CFDEXPORTS, CFDFILE);
 		return container;
 	}
 

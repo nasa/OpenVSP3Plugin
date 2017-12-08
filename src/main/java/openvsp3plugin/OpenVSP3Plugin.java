@@ -39,7 +39,7 @@ import javafx.collections.ObservableList;
  */
 class OpenVSP3Plugin {
 	
-	static final String VERSION = "2.0.5";
+	static final String VERSION = "2.0.6";
 	static final String TITLE = "OpenVSP 3.0 Plugin v(" + VERSION + ")";
 	static final String CSVSPLITSTRING = "\\s+|\\s*,\\s*";
 	static final String FILE = "File";
@@ -52,6 +52,8 @@ class OpenVSP3Plugin {
 	static final HashSet<String> MADETEMP = new HashSet<>(Arrays.asList(new String[] {"stl", "dat", "tri", "msh"}));
 	static final String[] EXPORTS = {"vsp3", "DegenGeom", "des", "hrm", "p3d", "stl", "dat", "tri", "msh",
 												"pov", "inc", "x3d", "stp", "igs", "dxf", "svg"};
+	static final String CFDFILE = "CFDFile";
+	static final String[] CFDEXPORTS = {"stl", "poly", "tri", "obj", "dat", "key", "msh", "srf", "tkey", "facet"};
 	private static final Logger LOG = new Logger(OpenVSP3Plugin.class.getSimpleName());
 			
 	static final Map<String, String> EXPORTMAP;
@@ -70,6 +72,22 @@ class OpenVSP3Plugin {
 		EXPORTMAP.put("igs", "EXPORT_IGES");
 		EXPORTMAP.put("dxf", "EXPORT_DXF");
 		EXPORTMAP.put("svg", "EXPORT_SVG");
+    }
+	
+	static final Map<String, String> CFDMAP;
+	static
+	{
+        CFDMAP = new HashMap<>();
+        CFDMAP.put("stl", "CFD_STL_TYPE");
+        CFDMAP.put("poly", "CFD_POLY_TYPE");
+		CFDMAP.put("tri", "CFD_TRI_TYPE");
+		CFDMAP.put("obj", "CFD_OBJ_TYPE");
+		CFDMAP.put("dat", "CFD_DAT_TYPE");
+		CFDMAP.put("key", "CFD_KEY_TYPE");
+		CFDMAP.put("msh", "CFD_GMSH_TYPE");
+		CFDMAP.put("srf", "CFD_SRF_TYPE");
+		CFDMAP.put("tkey", "CFD_TKEY_TYPE");
+		CFDMAP.put("facet", "CFD_FACET_TYPE");
     }
 	
 	private Path openMDAOStatePath = Paths.get("State.xml");
@@ -245,7 +263,6 @@ class OpenVSP3Plugin {
 		if (pluginState == null) {
 			LOG.warn("writeVSPScriptFile() pluginState is null");
 		} else {
-			ObservableList<DesignVariable> files = pluginState.getDesignVariables().filtered(dv -> (dv.getId().equals(FILE)));
 			BufferedWriter bw = new BufferedWriter(new FileWriter(tempDir + "\\" + filename));
 			bw.write("void main()"); bw.newLine();
 			bw.write("{"); bw.newLine();
@@ -254,6 +271,7 @@ class OpenVSP3Plugin {
 				bw.write("  ReadApplyDESFile(\"OpenVSP3Plugin.des\");"); bw.newLine();
 			}
 			bw.write(String.format("  WriteVSPFile(\"%s\", %d);", "OpenVSP3Plugin.vsp3", 0)); bw.newLine();
+			ObservableList<DesignVariable> files = pluginState.getDesignVariables().filtered(dv -> (dv.getId().equals(FILE)));
 			for (DesignVariable dv : files) {
 				if (dv.getName().equals("vsp3") || dv.getName().equals("des")) {
 					// moved above for loop since we need this file to parse outputs
@@ -284,6 +302,12 @@ class OpenVSP3Plugin {
 				bw.write(String.format("  ComputeMassProps(%d, 100);", pluginState.getSetID())); bw.newLine();
 				bw.write("  meshgeoms = FindGeomsWithName(\"MeshGeom\");"); bw.newLine();
 				bw.write("  CutGeomToClipboard(meshgeoms[meshgeoms.length - 1]);"); bw.newLine();
+			}
+			// CFD Mesh
+			ObservableList<DesignVariable> cfdfiles = pluginState.getDesignVariables().filtered(dv -> (dv.getId().equals(CFDFILE)));
+			for (DesignVariable dv : cfdfiles) {
+				bw.write(String.format("  SetComputationFileName(%s, \"%s\");", CFDMAP.get(dv.getName()), tempDir.replace("\\", "/") + "/OpenVSP3PluginCFD." + dv.getName())); bw.newLine();
+				bw.write(String.format("  ComputeCFDMesh(%d, %s);", pluginState.getSetID(), CFDMAP.get(dv.getName()))); bw.newLine();
 			}
 			bw.write("  while ( GetNumTotalErrors() > 0 )"); bw.newLine();
 			bw.write("  {"); bw.newLine();

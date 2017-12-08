@@ -25,6 +25,7 @@ import com.phoenix_int.ModelCenter.ModelCenter;
 import com.phoenix_int.ModelCenter.ModelCenterException;
 import java.util.Map;
 import javafx.collections.ObservableList;
+import static openvsp3plugin.OpenVSP3Plugin.CFDFILE;
 
 /**
  * Wraps the ModelCenter IO so ModelCenterPlugin and be tested with a mockup wrapper.
@@ -99,6 +100,7 @@ class ModelCenterWrapper {
 		for (DesignVariable dv : dvList) {
 			FileVariable file = (FileVariable) component.getVariable(pluginState.getModelCenterName(dv));
 			String filename = tempDir + "\\OpenVSP3Plugin." + dv.getName();
+			if (dv.getId().equals(CFDFILE))  filename = tempDir + "\\OpenVSP3PluginCFD." + dv.getName();
 			if (dv.getName().equals("DegenGeom")) filename = tempDir + "\\OpenVSP3PluginDegenGeom.csv";
 			file.readFile(filename);
 			file.release();

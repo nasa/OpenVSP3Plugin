@@ -114,6 +114,7 @@ public class ModelCenterPlugin extends OpenVSP3Plugin implements com.phoenix_int
 			pluginState.writeDesFile(new File(tempDir + "\\OpenVSP3Plugin.des"), shouldSort());
 			runOpenVSPScript(pluginState.getOpenVSPFilename());
 			readExportFiles();
+			readCFDFiles();
 			readCompGeom();
 			readMassProp();
 			readOutputs();
@@ -162,7 +163,7 @@ public class ModelCenterPlugin extends OpenVSP3Plugin implements com.phoenix_int
 						mcWrapper.addInput(pluginState.getModelCenterName(dv), "double", dv.getValue());
 					}
 					for (DesignVariable dv : pluginState.getDesignVariables().filtered(dv -> dv.isOutput())) {
-						if (dv.getId().equals("File")) {
+						if (dv.getId().equals("File") || dv.getId().equals("CFDFile")) {
 							mcWrapper.addOutput(pluginState.getModelCenterName(dv), "file", "");
 						} else {
 							mcWrapper.addOutput(pluginState.getModelCenterName(dv), "double", dv.getValue());
@@ -210,6 +211,12 @@ public class ModelCenterPlugin extends OpenVSP3Plugin implements com.phoenix_int
 	private void readExportFiles() throws Exception {
 		LOG.trace("readExportFiles()");
 		ObservableList<DesignVariable> files = pluginState.getDesignVariables().filtered(dv -> (dv.getId().equals(FILE)));
+		mcWrapper.readFiles(files, pluginState, tempDir);
+	}
+	
+	private void readCFDFiles() throws Exception {
+		LOG.trace("readCFDFiles()");
+		ObservableList<DesignVariable> files = pluginState.getDesignVariables().filtered(dv -> (dv.getId().equals(CFDFILE)));
 		mcWrapper.readFiles(files, pluginState, tempDir);
 	}
 	
