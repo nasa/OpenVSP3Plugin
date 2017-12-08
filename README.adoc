@@ -70,5 +70,5 @@ and check the `Show Java Console` checkbox.
 == Documentation
 
 A presentation on how to use the OpenVSP3Plugin is located here:
-https://github.com/nasa/OpenVSP3Plugin/blob/master/welstead-openvsp3plugin.ppt[OpenVSP Workshop 2017 OpenVSP3Plugin]
+presentations/welstead-openvsp3plugin.ppt[OpenVSP Workshop 2017 OpenVSP3Plugin]
 
