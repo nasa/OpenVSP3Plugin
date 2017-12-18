@@ -76,7 +76,7 @@ class SwingDialog extends JFrame {
 				closeDialog(true);
 			}
 		});
-		JFXPanel fxContainer =createJavaFXUI();
+		JFXPanel fxContainer = createJavaFXUI();
 		fxContainer.setPreferredSize(new Dimension(width, height));
 		add(fxContainer, BorderLayout.CENTER);
 		pack();

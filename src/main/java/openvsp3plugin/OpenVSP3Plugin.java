@@ -157,14 +157,15 @@ class OpenVSP3Plugin {
 		// initialize executable and temp dir strings
 		openVSPExe = System.getenv("OpenVSP_EXE");
 		if ((openVSPExe == null) || openVSPExe.isEmpty()) {
-			throw new Exception("Environment variable OpenVSP_EXE not set.");
-		}
-		File file1 = new File(openVSPExe);
-		if (file1.isDirectory()) {
-			openVSPExe = openVSPExe + "\\vsp.exe";
-			File file2 = new File(openVSPExe);
-			if (!file2.exists()) {
-				throw new Exception(String.format("OpenVSP_EXE is a directory (%s) and it does not contain vsp.exe", openVSPExe));
+			openVSPExe = "ERROR: Environment variable OpenVSP_EXE not set.";
+		} else {
+			File file1 = new File(openVSPExe);
+			if (file1.isDirectory()) {
+				openVSPExe = openVSPExe + "\\vsp.exe";
+				File file2 = new File(openVSPExe);
+				if (!file2.exists()) {
+					openVSPExe = "ERROR: OpenVSP_EXE is a directory (%s) and it does not contain vsp.exe";
+				}
 			}
 		}
 		openVSPVersion = extractOpenVSPVersion(openVSPExe);
@@ -194,6 +195,7 @@ class OpenVSP3Plugin {
 			dialog = new SwingDialog(TITLE + " - " + componentName, this);
 			dialog.initSwingDialog();
 		});
+		if (openVSPExe.startsWith("ERROR")) dialog.showErrorPopup(openVSPExe);
 	}
 	
 	void configureProcessBuilder(ProcessBuilder pb) {
@@ -322,6 +324,7 @@ class OpenVSP3Plugin {
 	void readCompGeomMaps(Map<String, String> compGeomMap, Map<String, String> tagCompGeomMap) throws Exception {
 		LOG.trace("readCompGeomMaps()");
 		// Read the CompGeom file and store data in map parameters if not null
+		HashMap<String, Integer> nameCount = new HashMap<>();
 		String line;
 		try (BufferedReader br = new BufferedReader(new FileReader(tempDir + "\\OpenVSP3PluginCompGeom.csv"))) {
 			boolean firstTable = true;
@@ -336,8 +339,15 @@ class OpenVSP3Plugin {
 						if (columns.length != 5) {
 							throw new Exception(String.format("CompGeom table has %d columns not 5/n%s", columns.length, line));
 						}
+						// Keep names unique by adding a count
+						String name = columns[0];
+						if (!name.equals("Totals")) {
+							if (nameCount.containsKey(name)) nameCount.put(name, nameCount.get(name) + 1);
+							else nameCount.put(name, 0);
+							name += nameCount.get(name);
+					}
 						for (int i = 1; i < 5; i++) {
-							compGeomMap.put(String.format("%s:%s:%s", COMPGEOM, columns[0], COMPGEOMVALUES[i - 1]), columns[i]);
+							compGeomMap.put(String.format("%s:%s:%s", COMPGEOM, name, COMPGEOMVALUES[i - 1]), columns[i]);
 						}
 					}
 				} else { // tag table

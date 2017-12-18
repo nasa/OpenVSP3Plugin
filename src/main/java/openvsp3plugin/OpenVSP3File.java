@@ -45,7 +45,6 @@ import org.w3c.dom.NodeList;
 public class OpenVSP3File {
 	
 	public static final String USERPARMS = "UserParms";
-	public static final String[] CONTAINERS = {"Vehicle", "CfdSettings", "CFDGridDensity", "FEAGridDensity"};
 	public static final String[] SUBSURFACES = {"SubSurface", "SS_Rectangle", "SS_Ellipse", "SS_Control"};
 	public static final String[] CHOICEVECTOR = {"Aspect", "Span", "Area", "Taper", "Avg_Chord", "Root_Chord", "Tip_Chord", "Sec_Sweep"};
 	
@@ -102,14 +101,7 @@ public class OpenVSP3File {
 		for (int i = 1; i <= nGeoms; i++) {
 			containerArrayList.add(getGeomContainer(GEOMETRYPATH + "[" + i + "]/"));
 		}
-		for (String container : CONTAINERS) {
-			try { // old files don't have the Vehicle container so get a null pointer exception
-			containerArrayList.add(getContainer("/Vsp_Geometry/" + container + "/ParmContainer"));
-			}  catch (Exception ex) {
-				// if not the no Vehicle container problem re-throw
-				if (!container.equals(CONTAINERS[3])) throw ex;
-			} 
-		}
+		addTopLevelContainers();
 		containerArrayList.add(getFileContainer());
 		containerArrayList.add(compGeomContainer);
 		containerArrayList.add(compGeom2Container);
@@ -193,6 +185,15 @@ public class OpenVSP3File {
 			container.getChildren().add(group);
 		}
 		return container;
+	}
+	
+	private void addTopLevelContainers() throws Exception {
+		NodeList nodes = xpu.getElementNodes("/Vsp_Geometry/*/ParmContainer");
+		for (int i = 1; i < nodes.getLength(); i++) {
+			Node node = nodes.item(i);
+			Node parent = node.getParentNode();
+			containerArrayList.add(getContainer("/Vsp_Geometry/" + parent.getNodeName() + "/ParmContainer"));
+		}
 	}
 	
 	private TreeItem<DesignVariableGroup> getContainer(String prefix) throws Exception {
