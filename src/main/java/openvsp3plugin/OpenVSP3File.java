@@ -189,7 +189,7 @@ public class OpenVSP3File {
 	
 	private void addTopLevelContainers() throws Exception {
 		NodeList nodes = xpu.getElementNodes("/Vsp_Geometry/*/ParmContainer");
-		for (int i = 1; i < nodes.getLength(); i++) {
+		for (int i = 0; i < nodes.getLength(); i++) {
 			Node node = nodes.item(i);
 			Node parent = node.getParentNode();
 			containerArrayList.add(getContainer("/Vsp_Geometry/" + parent.getNodeName() + "/ParmContainer"));
